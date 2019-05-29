@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RV Demo: Scatter Plot</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+
+<body>
+  <h1> RV Plot Demo: Scatter Plot </h1>
+  <div> Stephen Stapleton, May 29, 2019 </div>
+  <script src='https://d3js.org/d3.v4.js'></script>
+  <div id="scatter_plot"></div>
+  <div id="line_plot"></div>
+  <script>
+
+  // define basic plot configurations
+  const height = 600;
+  const width = 600;
+  const margin = {top: 100, left: 50, right: 50, bottom: 50};
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+
+  var svg = d3.select("#scatter_plot")
+              .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+              .append("g")
+                .attr("transform",
+                      "translate("+margin.left+","+margin.top+")")
+
+  // add a title, subtitle, and data source
+  svg.append("text")
+     .attr("x", 0)
+     .attr("y", 0 - (margin.top/1.8))
+     .attr("text-anchor", "start")
+     .style("font-weight", "bold")
+     .text("K1 Visa Sponsors Trend Older Than Their Foreign-Born Counterparts");
+
+  svg.append("text")
+     .attr("x", 0)
+     .attr("y", 0 - (margin.top/3))
+     .attr("text-anchor", "start")
+     .text("U.S. sponsors trend around 5 years older than their respective fiances.");
+
+  svg.append("text")
+     .attr("x", plotWidth)
+     .attr("y", plotHeight + margin.bottom - 10)
+     .attr("text-anchor", "end")
+     .text("Data Source: RapidVisa 2014-2018");
+
+  // read in Data
+  d3.csv("RV_age.csv", function (data) {
+
+  // Create scales (x mapping, y mapping, color mapping)
+  const x = d3.scaleLinear()
+                .domain([0,0])
+                .range([0, plotWidth]);
+  svg.append("g")
+      .attr("class", "scatXAxis")
+      .attr("transform", "translate(0,"+plotHeight+")")
+      .call(d3.axisBottom(x))
+      .attr("opacity", "0")
+
+  const y = d3.scaleLinear()
+                   .domain([0,120])
+                   .range([plotHeight, 0]);
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+  svg.append("text")
+      .attr("x", (plotWidth/2 + 170))
+      .attr("y", plotHeight - 10)
+      .style("text-anchor", "middle")
+      .text('Applicant Age');
+
+  svg.append("text")
+      .attr("transform", "rotate(90)")
+      .attr("x", 0 + (plotHeight/2) - 170)
+      .attr("y", -10)
+      .style("text-anchor", "middle")
+      .text('Sponsor Age');
+
+  // add the data, creating nifty transition
+  // adapted from https://www.d3-graph-gallery.com/graph/scatter_animation_start.html
+  svg.append("g")
+      .selectAll("dot")
+      .data(data)
+      .enter()
+      .append("circle")
+        .attr("cx", function (d) {return x(d.alienAge);})
+        .attr("cy", function (d) {return y(d.sponsorAge);})
+        .attr("r", 1.5)
+        .style("fill", "#69b3a2")
+
+  svg.append("line")
+      .style("stroke", "red")
+      .style("stroke-dasharray", ("3, 3"))
+      .attr("x1", 0)
+      .attr("y1", plotHeight)
+      .attr("x2", plotWidth)
+      .attr("y2", 0);
+
+  // new X axis
+  x.domain([0,120])
+  svg.select(".scatXAxis")
+      .transition()
+      .duration(2000)
+      .attr("opacity", "1")
+      .call(d3.axisBottom(x));
+
+  svg.selectAll("circle")
+      .transition()
+      .delay(function(d,i) {return(i*2)})
+      .duration(1000)
+      .attr("cx", function (d) {return x(d.alienAge);})
+      .attr("cy", function (d) {return y(d.sponsorAge);})
+
+  })
+
+  </script>

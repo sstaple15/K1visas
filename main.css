@@ -1,0 +1,17 @@
+html,
+
+body {
+  align-items: center;
+  display: flex;
+  flex-direction: column
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #A9A9A9;
+}
+
+.dot {
+  stroke: #000000;
+}
